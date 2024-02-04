@@ -15,19 +15,25 @@ async function init() {
         }
     })
 
+
     io.on("connection", (socket) => {
         console.log(`New Socket Connected :${socket.id}`)
-        socket.on("event:message", ({ message }: { message: string }) => {
+        socket.on("send:message", async ({ message }: { message: string }) => {
             console.log(`Got the msg ::: ${message}`)
-            io.emit("event:message", { message })
-            // socket.broadcast.emit("event:message", { message })
+            io.emit("receive:message", { message })
+            // socket.broadcast.emit("message", { message })
+
+            //Publish this message to Redis
+            // await pub.publish("MESSAGE", JSON.stringify({ message }))
         })
+
 
         // Disconnect event
         socket.on('disconnect', () => {
             console.log(`Socket disconnected: ${socket.id}`);
         });
     })
+
 
     const PORT = process.env.PORT ? process.env.PORT : 5000
     httpServer.listen(PORT, () => {
